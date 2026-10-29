@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard | CampusDesk</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="/dashboard"><span class="brand-mark small">C</span><span>CampusDesk<small>STUDENT PORTAL</small></span></a>
+      <p class="nav-label">WORKSPACE</p>
+      <button class="nav-item active" data-view="overview"><span>◫</span> Overview</button>
+      <button class="nav-item" data-view="students"><span>♙</span> Students</button>
+      <button class="nav-item" data-view="attendance"><span>✓</span> Attendance</button>
+      <button class="nav-item" data-view="marks"><span>▤</span> Marks & grades</button>
+      <div class="sidebar-foot"><span class="avatar" id="user-avatar">U</span><span id="user-label">Loading...</span><button id="logout" class="icon-button" title="Sign out">↗</button></div>
+    </aside>
+    <main class="main-content">
+      <header class="topbar"><div><p class="eyebrow">ACADEMIC OVERVIEW</p><h1 id="page-title">Dashboard</h1></div><div class="top-actions"><span class="today" id="today-label"></span><button id="theme-toggle" class="button secondary">☼ Theme</button></div></header>
+      <div id="notice" class="notice" role="status"></div>
+      <section class="view active" id="overview-view">
+        <div class="welcome-banner"><div><p class="eyebrow">YOUR CAMPUS, AT A GLANCE</p><h2>Good day, <span id="welcome-name">there</span>.</h2><p class="muted">Here is the latest snapshot of your academic records.</p></div><div class="banner-icon">✦</div></div>
+        <div class="stat-grid">
+          <article class="stat-card"><span class="stat-icon blue">♙</span><p class="muted">Students</p><strong id="student-count">—</strong><small>Active student records</small></article>
+          <article class="stat-card"><span class="stat-icon green">✓</span><p class="muted">Present today</p><strong id="present-count">—</strong><small>Attendance records marked</small></article>
+          <article class="stat-card"><span class="stat-icon purple">◷</span><p class="muted">Attendance rate</p><strong id="attendance-rate">—</strong><small>Across recorded sessions</small></article>
+        </div>
+        <div class="panel-grid">
+          <article class="panel"><div class="panel-heading"><div><h3>Students by class</h3><p class="muted">Current student distribution</p></div></div><div class="chart-wrap"><canvas id="class-chart"></canvas></div></article>
+          <article class="panel"><div class="panel-heading"><div><h3>Quick guide</h3><p class="muted">Available in this project build</p></div></div><ul class="guide-list"><li><span>01</span> Browse student records</li><li><span>02</span> Record daily attendance</li><li><span>03</span> Enter marks and calculate grades</li><li><span>04</span> Review your reports</li></ul></article>
+        </div>
+      </section>
+      <section class="view" id="students-view">
+        <div class="section-toolbar"><div><h2>Students</h2><p class="muted">Search and manage student records.</p></div><button id="add-student-button" class="button primary">＋ Add student</button></div>
+        <div class="filter-row"><input id="student-search" placeholder="Search name, email, or ID..." aria-label="Search students"><select id="class-filter" aria-label="Filter by class"><option value="">All classes</option></select><select id="student-sort" aria-label="Sort students"><option value="name">Sort: name</option><option value="enrollment">Sort: enrollment</option><option value="class">Sort: class</option></select></div>
+        <div class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>STUDENT</th><th>ENROLLMENT</th><th>CLASS</th><th>EMAIL</th><th></th></tr></thead><tbody id="students-body"></tbody></table></div></div>
+      </section>
+      <section class="view" id="attendance-view">
+        <div class="section-toolbar"><div><h2>Attendance</h2><p class="muted">Daily attendance and recent records.</p></div></div>
+        <form id="attendance-form" class="panel inline-form"><label>Student<select name="student_id" class="student-options" required></select></label><label>Date<input name="attendance_date" type="date" required></label><label>Status<select name="status"><option>Present</option><option>Absent</option><option>Late</option></select></label><button class="button primary">Save attendance</button></form>
+        <div class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>STUDENT</th><th>DATE</th><th>STATUS</th></tr></thead><tbody id="attendance-body"></tbody></table></div></div>
+      </section>
+      <section class="view" id="marks-view">
+        <div class="section-toolbar"><div><h2>Marks & grades</h2><p class="muted">Scores are out of 100; grades are calculated automatically.</p></div></div>
+        <form id="marks-form" class="panel inline-form"><label>Student<select name="student_id" class="student-options" required></select></label><label>Subject<select name="subject_id" id="subject-options" required></select></label><label>Score<input name="score" type="number" min="0" max="100" step="0.5" required></label><button class="button primary">Save marks</button></form>
+        <div class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>STUDENT</th><th>SUBJECT</th><th>SCORE</th><th>GRADE</th></tr></thead><tbody id="marks-body"></tbody></table></div></div>
+      </section>
+    </main>
+  </div>
+  <dialog id="student-dialog" class="student-dialog">
+    <form id="student-form" method="dialog">
+      <div class="dialog-heading"><div><p class="eyebrow">STUDENT RECORD</p><h2 id="student-dialog-title">Add student</h2></div><button type="button" class="icon-button" id="close-dialog" aria-label="Close">×</button></div>
+      <input type="hidden" name="id">
+      <label>Full name<input name="name" maxlength="100" required></label>
+      <label>Enrollment number<input name="enrollment_no" maxlength="30" required></label>
+      <label>Email<input name="email" type="email" maxlength="200" required></label>
+      <label>Class<select name="class_id" class="class-options" required></select></label>
+      <p class="form-error" id="student-form-error"></p>
+      <div class="dialog-actions"><button type="button" class="button secondary" id="cancel-dialog">Cancel</button><button type="submit" class="button primary">Save student</button></div>
+    </form>
+  </dialog>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

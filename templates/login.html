@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#172641">
+  <title>Sign in | CampusDesk</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+</head>
+<body class="login-page">
+  <main class="login-layout">
+    <section class="login-showcase" aria-label="CampusDesk introduction">
+      <a class="login-brand" href="/" aria-label="CampusDesk home">
+        <span class="login-brand-mark">C</span>
+        <span>CampusDesk<small>STUDENT MANAGEMENT</small></span>
+      </a>
+
+      <div class="showcase-copy">
+        <p class="showcase-eyebrow"><span></span> A clearer view of campus life</p>
+        <h1>Every student story,<br><em>all in one place.</em></h1>
+        <p class="showcase-description">Bring student records, attendance, and academic progress together in one simple workspace.</p>
+
+        <div class="showcase-features">
+          <div class="showcase-feature"><span class="feature-icon">01</span><span><strong>Records that stay organized</strong><small>Find student details without the paperwork.</small></span></div>
+          <div class="showcase-feature"><span class="feature-icon">02</span><span><strong>Attendance made clearer</strong><small>Keep a consistent record of every class.</small></span></div>
+          <div class="showcase-feature"><span class="feature-icon">03</span><span><strong>Progress at a glance</strong><small>See marks and grades in one place.</small></span></div>
+        </div>
+      </div>
+
+      <div class="showcase-preview" aria-hidden="true">
+        <div class="preview-top"><span class="preview-window-dots"><i></i><i></i><i></i></span><span>ACADEMIC OVERVIEW</span><span class="preview-live"><i></i> LIVE</span></div>
+        <div class="preview-title">Your campus, at a glance</div>
+        <div class="preview-metrics">
+          <div><small>STUDENTS</small><strong>40</strong><span>Across 4 classes</span></div>
+          <div><small>ATTENDANCE</small><strong>92<small>%</small></strong><span>Recent sessions</span></div>
+        </div>
+        <div class="preview-chart"><span style="--bar-height:45%"></span><span style="--bar-height:72%"></span><span style="--bar-height:55%"></span><span style="--bar-height:88%"></span><span style="--bar-height:64%"></span><span style="--bar-height:100%"></span><span style="--bar-height:76%"></span></div>
+        <div class="preview-chart-labels"><span>CLASS A</span><span>CLASS B</span><span>CLASS C</span><span>CLASS D</span></div>
+      </div>
+
+      <p class="showcase-footer">A little more time for what matters most.</p>
+    </section>
+
+    <section class="login-panel" aria-labelledby="login-title">
+      <div class="login-card">
+        <div class="mobile-brand">
+          <span class="login-brand-mark">C</span>
+          <span>CampusDesk<small>STUDENT MANAGEMENT</small></span>
+        </div>
+        <div class="login-heading">
+          <p class="login-kicker">WELCOME TO CAMPUSDESK</p>
+          <h2 id="login-title">Sign in to your workspace</h2>
+          <p>Choose your account type and enter your details.</p>
+        </div>
+
+        <form id="login-form">
+          <fieldset class="role-select">
+            <legend>Choose your account</legend>
+            <div class="role-options">
+              <label class="role-choice">
+                <input type="radio" name="role" value="student" checked>
+                <span class="role-icon" aria-hidden="true">S</span>
+                <span class="role-name">Student</span>
+              </label>
+              <label class="role-choice">
+                <input type="radio" name="role" value="admin">
+                <span class="role-icon" aria-hidden="true">A</span>
+                <span class="role-name">Admin</span>
+              </label>
+              <label class="role-choice">
+                <input type="radio" name="role" value="teacher">
+                <span class="role-icon" aria-hidden="true">T</span>
+                <span class="role-name">Teacher</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <label class="login-field" for="username">Username
+            <span class="input-wrap"><span class="input-icon" aria-hidden="true">＠</span><input id="username" name="username" autocomplete="username" placeholder="Enter your username" required maxlength="80"></span>
+          </label>
+          <label class="login-field" for="password">Password
+            <span class="input-wrap"><span class="input-icon password-icon" aria-hidden="true">●</span><input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required maxlength="200"></span>
+          </label>
+
+          <p class="form-error" id="login-error" role="alert" aria-live="polite"></p>
+          <button class="button primary full login-submit" id="login-submit" type="submit"><span>Sign in securely</span><span aria-hidden="true">→</span></button>
+        </form>
+
+        <details class="demo-logins">
+          <summary><span>Need a demo account?</span><span class="demo-summary-action">View credentials <span aria-hidden="true">＋</span></span></summary>
+          <div class="demo-account-list">
+            <p><span>Student</span><code>student</code><code>Student@123</code></p>
+            <p><span>Admin</span><code>admin</code><code>Admin@123</code></p>
+            <p><span>Teacher</span><code>teacher</code><code>Teacher@123</code></p>
+          </div>
+        </details>
+        <p class="login-security"><span aria-hidden="true">●</span> Your sign-in is protected by role-based access.</p>
+      </div>
+      <p class="login-copyright">CampusDesk <span>·</span> Student Management System</p>
+    </section>
+  </main>
+  <script>
+    document.getElementById("login-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const error = document.getElementById("login-error");
+      const button = document.getElementById("login-submit");
+      error.textContent = "";
+      button.disabled = true;
+      button.querySelector("span").textContent = "Signing in...";
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST", headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            username: document.getElementById("username").value,
+            password: document.getElementById("password").value,
+            role: document.querySelector('input[name="role"]:checked').value
+          })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Could not sign in.");
+        window.location.href = "/dashboard";
+      } catch (reason) {
+        error.textContent = reason.message;
+      } finally {
+        button.disabled = false;
+        button.querySelector("span").textContent = "Sign in securely";
+      }
+    });
+  </script>
+</body>
+</html>
